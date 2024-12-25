@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Trends</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Twitter Trends</h1>
+    
+    <p><a href="#" id="runScriptLink">Click here to run the script.</a></p>
+
+    <div id="result" style="display:none;">
+        <h2>These are the most happening topics as of <span id="timestamp"></span></h2>
+        <ul id="trends"></ul>
+        <p>The IP address used for this query was <span id="ipAddress"></span>.</p>
+        <h3>Here’s a JSON extract of this record from the MongoDB:</h3>
+        <pre id="jsonOutput"></pre>
+        <p><a href="#" id="runScriptLinkAgain">Click here to run the query again.</a></p>
+    </div>
+
+    <script>
+        $("#runScriptLink").click(function(e) {
+            e.preventDefault();
+            $.get("/run_script", function(data) {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    var timestamp = data.timestamp;
+                    var trends = data.trends;
+                    var ipAddress = data.ip_address;
+                    var jsonData = JSON.stringify(data, null, 4);
+                    
+                    $("#timestamp").text(timestamp);
+                    $("#ipAddress").text(ipAddress);
+                    $("#jsonOutput").text(jsonData);
+                    $("#trends").empty();
+                    
+                    trends.forEach(function(trend) {
+                        $("#trends").append("<li>" + trend + "</li>");
+                    });
+
+                    $("#result").show();
+                }
+            });
+        });
+
+        $("#runScriptLinkAgain").click(function(e) {
+            e.preventDefault();
+            $("#result").hide();  
+        });
+    </script>
+</body>
+</html>
